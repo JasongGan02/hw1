@@ -23,6 +23,9 @@ size_t ULListStr::size() const
 {
   return size_;
 }
+
+// WRITE YOUR CODE HERE
+
 void ULListStr::push_back(const std::string& val)
 {
   if (head_ == nullptr & tail_==nullptr) //if it is an empty list
@@ -38,20 +41,101 @@ void ULListStr::push_back(const std::string& val)
     Item->prev = tail_;
     tail_ = Item;
   }
-  tail_->val[tail_->first] = val;
   tail_->last += 1;
-  size_ += 1; 
+  tail_->val[tail_->last-1] = val;
+  size_ ++; 
 }
+
 void ULListStr::pop_back()
 {
-  if (head_ == nullptr & tail_==nullptr) //if it is an empty list
+  if (head_ == nullptr && tail_==nullptr) //if it is an empty list
     return;
-  else if (tail_->last == 1) //deallocate tail if there is only one string
+  
+  // Case where the tail node has only one element
+  if (tail_->last - tail_->first <= 1) 
   {
-    Item* Item = new ULListStr::Item();
+    Item* prev = tail_->prev;
+    delete tail_;
+    if (prev != nullptr)
+    {
+      prev->next = nullptr;
+      tail_ = prev;
+    }
+    else // The list had only one node
+    {
+      head_ = nullptr;
+      tail_ = nullptr;
+    }
   }
+  else //stop maintaining the last element
+  {
+    tail_->last--;
+  }
+  size_--;
 }
-// WRITE YOUR CODE HERE
+
+/**
+ * Adds a new value to the front of the list.
+ * If there is room before the 'first' value in
+ * the head node add it there, otherwise, 
+ * allocate a new head node.
+ *   - MUST RUN in O(1)
+ */
+void ULListStr::push_front(const std::string& val)
+{
+  if(head_ == nullptr && tail_ == nullptr) //empty list
+  {
+    Item* newItem = new ULListStr::Item();
+    head_ = newItem;
+    tail_ = newItem;
+    head_->last = 1; // Since this is a new node, set last to 1
+  }
+  else if(head_->first == 0) //full head node
+  {
+    Item* newItem = new Item();
+    newItem->next = head_;
+    head_->prev = newItem;
+    head_ = newItem;
+    head_->last = 1; // Since this is a new node, set last to 1
+  }
+  else //space before first
+  {
+    head_->first --;
+  }
+  head_->val[head_->first] = val;
+  size_++;
+}
+
+/**
+ * Removes a value from the front of the list
+ *   - MUST RUN in O(1)
+ */
+void ULListStr::pop_front()
+{
+  if (head_ == nullptr && tail_ == nullptr) //empty list
+    return;
+  
+  if (head_->last - head_->first <= 1) //a head with only element
+  {
+    Item* next = head_->next;
+    delete head_;
+    head_ = next;
+    if (head_ != nullptr)
+    {
+      head_->prev = nullptr;
+    }
+    else //head == tail
+    {
+      tail_ = nullptr;
+    }
+  }
+  else
+  {
+    head_->first++;
+  }
+  size_ --;
+}
+
 std::string const & ULListStr::back() const
 {
   return tail_->val[tail_->last-1];
